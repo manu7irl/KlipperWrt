@@ -9,8 +9,8 @@ echo " "
 echo "Creating a 1GB swap file"
 dd if=/dev/zero of=/swap.page bs=1M count=1024;
 echo "Enabling swap file"
-mkswap /overlay/swap.page;
-swapon /overlay/swap.page;
+mkswap /swap.page;
+swapon /swap.page;
 mount -o remount,size=512M /tmp;
 
 echo "Updating rc.local for swap"
@@ -20,7 +20,7 @@ cat << "EOF" > /etc/rc.local
 # the system init finished. By default this file does nothing.
 
 ###activate the swap file on the SD card  
-swapon /overlay/swap.page  
+swapon /swap.page  
 
 ###expand /tmp space  
 mount -o remount,size=512M /tmp
@@ -55,8 +55,7 @@ cat << "EOF" > /etc/opkg.conf
 dest root /
 dest ram /tmp
 lists_dir ext /var/opkg-lists
-option overlay_root /overlay
-#option check_signature
+option check_signature
 EOF
 
 opkg update;
