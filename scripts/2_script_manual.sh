@@ -51,8 +51,6 @@ cat << "EOF" > /etc/opkg.conf
 dest root /
 dest ram /tmp
 lists_dir ext /var/opkg-lists
-option overlay_root /overlay
-#option check_signature
 EOF
 
 
