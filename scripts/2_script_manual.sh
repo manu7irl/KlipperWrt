@@ -33,30 +33,28 @@ echo "############################"
 echo "### Klipper dependencies ###"
 echo "############################"
 echo " "
-
 echo "Installing dependencies..."
-opkg update && opkg install git-http unzip htop zram-swap gcc;
-
-
-echo "Changing distfeeds for python2..."
-mv /etc/opkg/distfeeds.conf /etc/opkg/distfeeds.conf_orig;
-cat << "EOF" > /etc/opkg/distfeeds.conf
-src/gz openwrt_core https://downloads.openwrt.org/releases/19.07.7/targets/ramips/mt76x8/packages
-src/gz openwrt_base https://downloads.openwrt.org/releases/19.07.7/packages/mipsel_24kc/base
-src/gz openwrt_luci https://downloads.openwrt.org/releases/19.07.7/packages/mipsel_24kc/luci
-src/gz openwrt_packages https://downloads.openwrt.org/releases/19.07.7/packages/mipsel_24kc/packages
-src/gz openwrt_routing https://downloads.openwrt.org/releases/19.07.7/packages/mipsel_24kc/routing
-src/gz openwrt_telephony https://downloads.openwrt.org/releases/19.07.7/packages/mipsel_24kc/telephony
-EOF
-
+### Backup no working distfeed.conf
+mv /etc/opkg/distfeeds.conf /etc/opkg/distfeeds.conf_orig_old;
 mv /etc/opkg.conf /etc/opkg.conf_orig;
+
+cat << "EOF" > /etc/opkg/distfeeds.conf
+src/gz openwrt_core https://downloads.openwrt.org/releases/21.02.0/targets/bcm27xx/bcm2708/packages
+src/gz openwrt_base https://downloads.openwrt.org/releases/21.02.0/packages/arm_arm1176jzf-s_vfp/base
+src/gz openwrt_luci https://downloads.openwrt.org/releases/21.02.0/packages/arm_arm1176jzf-s_vfp/luci
+src/gz openwrt_packages https://downloads.openwrt.org/releases/21.02.0/packages/arm_arm1176jzf-s_vfp/packages
+src/gz openwrt_routing https://downloads.openwrt.org/releases/21.02.0/packages/arm_arm1176jzf-s_vfp/routing
+src/gz openwrt_telephony https://downloads.openwrt.org/releases/21.02.0/packages/arm_arm1176jzf-s_vfp/telephony
+EOF
 
 cat << "EOF" > /etc/opkg.conf
 dest root /
 dest ram /tmp
 lists_dir ext /var/opkg-lists
-option check_signature
+option overlay_root /overlay
+#option check_signature
 EOF
+
 
 opkg update;
 opkg install python python-pip python-cffi python-dev gcc;
@@ -100,13 +98,13 @@ echo "Installing pip3 packages..."
 pip3 install inotify-simple python-jose libnacl paho-mqtt==1.5.1;
 
 
-echo "Downloading lmdb and streaming-form-data package..."
+#echo "Downloading lmdb and streaming-form-data package..."
 
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/python3-lmdb%2Bstreaming-form-data_packages_1.0-1_mipsel_24kc.ipk -P /root/;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/python3-lmdb%2Bstreaming-form-data_packages_1.0-1_mipsel_24kc.ipk -P /root/;
 
-echo "Installing lmdb and streaming-form-data package..."
-opkg install /root/*ipk;
-rm -rf *ipk;
+#echo "Installing lmdb and streaming-form-data package..."
+#opkg install /root/*ipk;
+#rm -rf *ipk;
 
 echo " "
 echo "###############"
@@ -269,27 +267,28 @@ opkg install wget-ssl;
 rm -rf /tmp/opkg-lists 
 
 echo "Installing Timelapse offline pacakges..."
-mkdir /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages.gz -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages.manifest -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages.sig -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/alsa-lib_1.2.4-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/fdk-aac_2.0.1-4_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/ffmpeg_4.3.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/ffprobe_4.3.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libatomic1_8.4.0-3_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libbz21.0_1.0.8-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libffmpeg-full_4.3.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libgmp10_6.2.1-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libgnutls_3.7.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libnettle8_3.6-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libx264_2020-10-26-1_mipsel_24kc.ipk -P /root/ffmpeg;
-wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/shine_3.1.1-1_mipsel_24kc.ipk -P /root/ffmpeg;
+opkg install ffmpeg libffmpeg-full alsa-lib fdk-aac ffprobe libbz limgmp libgnutls libnettle8 libx shine ;
+#mkdir /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages.gz -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages.manifest -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/Packages.sig -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/alsa-lib_1.2.4-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/fdk-aac_2.0.1-4_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/ffmpeg_4.3.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/ffprobe_4.3.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libatomic1_8.4.0-3_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libbz21.0_1.0.8-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libffmpeg-full_4.3.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libgmp10_6.2.1-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libgnutils_3.7.2-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libnettle8_3.6-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/libx264_2020-10-26-1_mipsel_24kc.ipk -P /root/ffmpeg;
+#wget https://github.com/ihrapsa/KlipperWrt/raw/main/packages/ffmpeg/shine_3.1.1-1_mipsel_24kc.ipk -P /root/ffmpeg;
 
 
-opkg install /root/ffmpeg/*ipk --force-overwrite;
-rm -rf /root/ffmpeg;
+$opkg install /root/ffmpeg/*ipk --force-overwrite;
+#rm -rf /root/ffmpeg;
 
 
 
