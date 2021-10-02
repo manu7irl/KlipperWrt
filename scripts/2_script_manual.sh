@@ -54,8 +54,22 @@ lists_dir ext /var/opkg-lists
 EOF
 
 
+opkg update && opkg install git-http unzip htop zram-swap gcc;
+
+echo "Changing distfeeds for python2..."
+mv /etc/opkg/distfeeds.conf /etc/opkg/distfeeds.conf_orig;
+cat << "EOF" > /etc/opkg/distfeeds.conf
+src/gz openwrt_core https://downloads.openwrt.org/releases/19.07.7/targets/arm_arm1176jzf-s_vfp/packages
+src/gz openwrt_base https://downloads.openwrt.org/releases/19.07.7/packages/arm_arm1176jzf-s_vfp/base
+src/gz openwrt_luci https://downloads.openwrt.org/releases/19.07.7/packages/arm_arm1176jzf-s_vfp/luci
+src/gz openwrt_packages https://downloads.openwrt.org/releases/19.07.7/packages/arm_arm1176jzf-s_vfp/packages
+src/gz openwrt_routing https://downloads.openwrt.org/releases/19.07.7/packages/arm_arm1176jzf-s_vfp/routing
+src/gz openwrt_telephony https://downloads.openwrt.org/releases/19.07.7/packages/arm_arm1176jzf-s_vfp/telephony
+EOF
+
 opkg update;
 opkg install python python-pip python-cffi python-dev gcc;
+
 
 echo "Cloning 250k baud pyserial"
 git clone https://github.com/ihrapsa/pyserial /root/pyserial;
